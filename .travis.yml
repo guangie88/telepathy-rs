@@ -35,7 +35,7 @@ script:
   elif [ "$COVERAGE" = "true" ]; then
     echo "Coverage not dealing with 'script'"
   else
-    cargo doc --all
+    cargo doc --no-deps
     cargo test --all --verbose
   fi
 
