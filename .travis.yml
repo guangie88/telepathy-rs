@@ -1,0 +1,63 @@
+language: rust
+
+matrix:
+  include:
+  - services: docker
+    env:
+      - LINT=true
+      - PUBLISH=true
+  - services: docker
+    env:
+      - COVERAGE=true
+  - rust: stable
+    sudo: false
+  - rust: beta
+    sudo: false
+  - rust: nightly
+    sudo: false
+  fast_finish: true
+
+before_script:
+- set -e
+- |
+  if [ "$LINT" = "true" ]; then
+    docker-compose -f docker-compose.lint-test.yml build lint-test
+  elif [ "$COVERAGE" = "true" ]; then
+    echo "Coverage not dealing with 'before_script'"
+  else
+    cargo test --all --no-run --verbose
+  fi
+
+script:
+- |
+  if [ "$LINT" = "true" ]; then
+    docker-compose -f docker-compose.lint-test.yml run lint-test
+  elif [ "$COVERAGE" = "true" ]; then
+    echo "Coverage not dealing with 'script'"
+  else
+    cargo doc --no-deps
+    cargo test --all --verbose
+  fi
+
+after_success:
+- |
+  if [ "$PUBLISH" = "true" ]; then
+    cargo login "$CRATES_TOKEN"
+
+    if [ -n "$TRAVIS_TAG" ]; then
+      # publish when this is a new tag
+      cargo publish --verbose
+    else
+      cargo publish --dry-run --verbose
+    fi
+  elif [ "$COVERAGE" = "true" ] && [ -z "$TRAVIS_TAG" ]; then
+    docker run --security-opt seccomp=unconfined -v "$PWD:/volume" \
+      guangie88/ubuntu-cargo-tarpaulin:xenial-stable "
+        cargo tarpaulin --all --out Xml \
+        && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN"
+  fi
+
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+\.\d+(-\S*)?$/

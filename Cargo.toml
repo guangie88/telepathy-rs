@@ -1,0 +1,22 @@
+[package]
+name = "telepathy"
+version = "0.0.1"
+authors = ["Chen Weiguang <chen.weiguang@gmail.com>"]
+description = "High-level Telegram Bot API library in Rust"
+documentation = "https://docs.rs/telepathy"
+repository = "https://github.com/guangie88/telepathy-rs"
+license-file = "LICENSE"
+
+[dependencies]
+derive_more = "0.11.0"
+emojicons = "1.0.1"
+failure = "0.1.1"
+failure_derive = "0.1.1"
+reqwest = "0.8.6"
+serde = "1.0.70"
+serde_derive = "1.0.70"
+url = "1.7.1"
+
+[lib]
+name = "telepathy"
+path = "src/lib.rs"

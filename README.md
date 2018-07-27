@@ -1,2 +1,3 @@
-# telepathy-rs
-Experimental Telegram Bot API library for Rust
+# `telepathy`
+
+Experimental high-level Telegram Bot API library for Rust.
